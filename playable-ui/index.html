@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokemon Battle Game</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #ffffff;
+      --panel-soft: #e2e8f0;
+      --text: #0f172a;
+      --muted: #475569;
+      --accent: #2563eb;
+      --accent-strong: #1d4ed8;
+      --success: #16a34a;
+      --danger: #dc2626;
+      --warn: #f59e0b;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      color: white;
+      background:
+        radial-gradient(circle at top, rgba(59, 130, 246, 0.35), transparent 35%),
+        linear-gradient(180deg, #0f172a 0%, #172554 55%, #1e3a8a 100%);
+    }
+
+    .shell {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    .hero {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+    }
+
+    .hero p {
+      margin: 0;
+      color: #cbd5e1;
+      font-size: 1.05rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
+    }
+
+    .primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .primary:hover {
+      background: var(--accent-strong);
+    }
+
+    .secondary {
+      background: rgba(255, 255, 255, 0.12);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 22px;
+      padding: 18px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.25);
+    }
+
+    .banner {
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      font-weight: 700;
+      display: none;
+    }
+
+    .banner.info {
+      display: block;
+      background: rgba(37, 99, 235, 0.18);
+      border: 1px solid rgba(96, 165, 250, 0.3);
+    }
+
+    .banner.error {
+      display: block;
+      background: rgba(220, 38, 38, 0.2);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      color: var(--text);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+    }
+
+    .card img {
+      width: 100%;
+      height: 180px;
+      object-fit: contain;
+      background: linear-gradient(180deg, #eff6ff, #dbeafe);
+      border-radius: 16px;
+      margin-bottom: 14px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .type {
+      padding: 6px 10px;
+      border-radius: 999px;
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 700;
+    }
+
+    .moves {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    .pill {
+      border-radius: 999px;
+      background: #e2e8f0;
+      color: #334155;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .battle-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .arena {
+      background: linear-gradient(180deg, #dcfce7, #bbf7d0 48%, #86efac 100%);
+      border-radius: 26px;
+      padding: 22px;
+      min-height: 520px;
+      color: var(--text);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .battle-pokemon {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 290px;
+    }
+
+    .battle-pokemon.enemy {
+      top: 22px;
+      right: 22px;
+      align-items: flex-end;
+    }
+
+    .battle-pokemon.player {
+      left: 22px;
+      bottom: 22px;
+      align-items: flex-start;
+    }
+
+    .battle-pokemon img {
+      width: 180px;
+      height: 180px;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .status-box {
+      background: rgba(255, 255, 255, 0.92);
+      border-radius: 18px;
+      padding: 14px;
+      min-width: 240px;
+      box-shadow: 0 12px 28px rgba(15, 23, 42, 0.14);
+    }
+
+    .hp-bar {
+      width: 100%;
+      height: 12px;
+      background: #cbd5e1;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .hp-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .log {
+      min-height: 140px;
+      max-height: 220px;
+      overflow: auto;
+      color: #dbeafe;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .move-grid,
+    .opponent-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .move-btn {
+      color: white;
+      min-height: 72px;
+    }
+
+    .inventory {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .small {
+      font-size: 0.92rem;
+      color: #cbd5e1;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .battle-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .arena {
+        min-height: 600px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .battle-pokemon img {
+        width: 132px;
+        height: 132px;
+      }
+
+      .status-box {
+        min-width: 0;
+        width: 210px;
+      }
+
+      .move-grid,
+      .opponent-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="hero">
+      <div>
+        <h1>Pokemon Battle Game</h1>
+        <p>Choose your Pokemon, start a battle, and use moves against the live backend.</p>
+      </div>
+      <div class="controls">
+        <button class="secondary" id="loadBtn">Load Game</button>
+        <button class="secondary" id="saveBtn">Save Game</button>
+        <button class="secondary" id="resetBtn">Reset View</button>
+      </div>
+    </div>
+
+    <div id="banner" class="banner"></div>
+
+    <section id="selectionView" class="panel">
+      <h2>Choose Your Pokemon</h2>
+      <p class="small">This screen talks directly to the Pokemon API on <code>127.0.0.1:8001</code>.</p>
+      <div id="pokemonCards" class="cards"></div>
+    </section>
+
+    <section id="battleView" class="panel hidden">
+      <div class="battle-layout">
+        <div class="arena">
+          <div id="enemyBox" class="battle-pokemon enemy"></div>
+          <div id="playerBox" class="battle-pokemon player"></div>
+        </div>
+
+        <div class="sidebar">
+          <div class="panel">
+            <h3 style="margin-top:0;">Battle Log</h3>
+            <div id="battleLog" class="log">No battle actions yet.</div>
+          </div>
+
+          <div id="opponentPanel" class="panel">
+            <h3 style="margin-top:0;">Choose Opponent</h3>
+            <div id="opponents" class="opponent-grid"></div>
+          </div>
+
+          <div id="movesPanel" class="panel hidden">
+            <h3 style="margin-top:0;">Your Moves</h3>
+            <div id="moves" class="move-grid"></div>
+            <div class="inventory" id="inventory"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const API = "http://127.0.0.1:8001";
+    const spriteIds = { Pikachu: 25, Charmander: 4, Squirtle: 7, Bulbasaur: 1 };
+    const typeColors = {
+      Electric: "#facc15",
+      Fire: "#f97316",
+      Water: "#3b82f6",
+      Grass: "#22c55e",
+      Normal: "#64748b"
+    };
+
+    const state = {
+      availablePokemon: [],
+      selectedPokemon: null,
+      opponentPokemon: null,
+      inventory: null,
+      inBattle: false,
+      message: "Choose a Pokemon to start."
+    };
+
+    const selectionView = document.getElementById("selectionView");
+    const battleView = document.getElementById("battleView");
+    const pokemonCards = document.getElementById("pokemonCards");
+    const opponents = document.getElementById("opponents");
+    const moves = document.getElementById("moves");
+    const inventory = document.getElementById("inventory");
+    const playerBox = document.getElementById("playerBox");
+    const enemyBox = document.getElementById("enemyBox");
+    const battleLog = document.getElementById("battleLog");
+    const banner = document.getElementById("banner");
+    const opponentPanel = document.getElementById("opponentPanel");
+    const movesPanel = document.getElementById("movesPanel");
+
+    function spriteUrl(name, back) {
+      const id = spriteIds[name] || 1;
+      return back
+        ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${id}.png`
+        : `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+    }
+
+    function hpColor(percentage) {
+      if (percentage > 50) return "#22c55e";
+      if (percentage > 25) return "#f59e0b";
+      return "#ef4444";
+    }
+
+    function typeBadge(type) {
+      return `<span class="type" style="background:${typeColors[type] || "#6b7280"}">${type}</span>`;
+    }
+
+    function setBanner(message, kind = "info") {
+      banner.textContent = message || "";
+      banner.className = message ? `banner ${kind}` : "banner";
+    }
+
+    async function request(path, options = {}) {
+      const response = await fetch(`${API}${path}`, {
+        headers: { "Content-Type": "application/json" },
+        ...options
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || data.message || "Request failed");
+      }
+      return data;
+    }
+
+    function renderSelection() {
+      pokemonCards.innerHTML = state.availablePokemon.map((pokemon) => `
+        <article class="card">
+          <img src="${spriteUrl(pokemon.name, false)}" alt="${pokemon.name}">
+          <div class="row">
+            <h3 style="margin:0;">${pokemon.name}</h3>
+            ${typeBadge(pokemon.type)}
+          </div>
+          <div style="margin-top:12px;color:#475569;line-height:1.7;">
+            <div class="row"><span>HP</span><strong>${pokemon.base_stats.hp}</strong></div>
+            <div class="row"><span>Attack</span><strong>${pokemon.base_stats.attack}</strong></div>
+            <div class="row"><span>Defense</span><strong>${pokemon.base_stats.defense}</strong></div>
+            <div class="row"><span>Speed</span><strong>${pokemon.base_stats.speed}</strong></div>
+          </div>
+          <div class="moves">
+            ${pokemon.starting_moves.map((move) => `<span class="pill">${move}</span>`).join("")}
+          </div>
+          <button class="primary" onclick="selectPokemon('${pokemon.name}')">Choose ${pokemon.name}</button>
+        </article>
+      `).join("");
+    }
+
+    function renderPokemonBox(pokemon, isPlayer) {
+      if (!pokemon) return "";
+      const percentage = Math.max(0, Math.min(100, (pokemon.current_hp / pokemon.max_hp) * 100));
+      return `
+        <div class="status-box">
+          <div class="row">
+            <strong>${pokemon.name}</strong>
+            <span>Lv.${pokemon.level}</span>
+          </div>
+          <div style="margin-top:10px;">HP ${pokemon.current_hp}/${pokemon.max_hp}</div>
+          <div class="hp-bar">
+            <div class="hp-fill" style="width:${percentage}%;background:${hpColor(percentage)}"></div>
+          </div>
+        </div>
+        <img src="${spriteUrl(pokemon.name, isPlayer)}" alt="${pokemon.name}">
+      `;
+    }
+
+    function renderBattle() {
+      selectionView.classList.toggle("hidden", !!state.selectedPokemon);
+      battleView.classList.toggle("hidden", !state.selectedPokemon);
+
+      if (!state.selectedPokemon) return;
+
+      playerBox.innerHTML = renderPokemonBox(state.selectedPokemon, true);
+      enemyBox.innerHTML = state.opponentPokemon ? renderPokemonBox(state.opponentPokemon, false) : "";
+
+      battleLog.textContent = state.message;
+
+      const candidateOpponents = state.availablePokemon.filter((p) => p.name !== state.selectedPokemon.name);
+      opponents.innerHTML = candidateOpponents.map((pokemon) => `
+        <button class="primary" onclick="startBattle('${pokemon.name}')">${pokemon.name}</button>
+      `).join("");
+
+      opponentPanel.classList.toggle("hidden", state.inBattle);
+      movesPanel.classList.toggle("hidden", !state.inBattle);
+
+      moves.innerHTML = (state.selectedPokemon.moves || []).map((move, index) => `
+        <button
+          class="move-btn"
+          style="background:${typeColors[move.type] || "#6b7280"};"
+          onclick="useMove(${index})"
+          ${state.inBattle ? "" : "disabled"}
+        >
+          <div>${move.name}</div>
+          <div style="font-size:0.82rem;font-weight:600;margin-top:6px;">${move.type} | ${move.power} power</div>
+        </button>
+      `).join("");
+
+      inventory.innerHTML = state.inventory ? `
+        <span class="pill">Potion x${state.inventory.potion}</span>
+        <span class="pill">Super Potion x${state.inventory.super_potion}</span>
+        <span class="pill">Revive x${state.inventory.revive}</span>
+      ` : "";
+    }
+
+    async function loadPokemon() {
+      try {
+        const data = await request("/pokemon");
+        state.availablePokemon = data.pokemon;
+        renderSelection();
+      } catch (error) {
+        setBanner(error.message, "error");
+      }
+    }
+
+    async function selectPokemon(name) {
+      try {
+        const data = await request("/select-pokemon", {
+          method: "POST",
+          body: JSON.stringify({ pokemon_name: name })
+        });
+        state.selectedPokemon = data.pokemon;
+        state.inventory = data.inventory;
+        state.opponentPokemon = null;
+        state.inBattle = false;
+        state.message = data.message + "\nChoose an opponent to start.";
+        setBanner(`${name} selected.`, "info");
+        renderBattle();
+      } catch (error) {
+        setBanner(error.message, "error");
+      }
+    }
+
+    async function startBattle(name) {
+      try {
+        const data = await request("/battle/start", {
+          method: "POST",
+          body: JSON.stringify({ opponent_name: name })
+        });
+        state.selectedPokemon = data.player_pokemon;
+        state.opponentPokemon = data.opponent_pokemon;
+        state.inBattle = true;
+        state.message = `${data.message}\nTurn ${data.turn}.`;
+        setBanner(`Battle started against ${name}.`, "info");
+        renderBattle();
+      } catch (error) {
+        setBanner(error.message, "error");
+      }
+    }
+
+    async function useMove(index) {
+      try {
+        const data = await request("/battle/move", {
+          method: "POST",
+          body: JSON.stringify({ move_index: index })
+        });
+        state.selectedPokemon = data.player_pokemon;
+        state.opponentPokemon = data.opponent_pokemon;
+        state.inBattle = !data.battle_ended;
+        const messages = data.turn_results.map((entry) => entry.message).join("\n");
+        const end = data.battle_ended ? `\nWinner: ${data.winner}` : "";
+        const level = data.level_up_messages ? `\n${data.level_up_messages.join("\n")}` : "";
+        state.message = `${messages}${end}${level}`;
+        setBanner(data.battle_ended ? `${data.winner} wins.` : "Move used.", "info");
+        renderBattle();
+      } catch (error) {
+        setBanner(error.message, "error");
+      }
+    }
+
+    async function saveGame() {
+      try {
+        const data = await request("/save", { method: "POST" });
+        setBanner(data.message, "info");
+      } catch (error) {
+        setBanner(error.message, "error");
+      }
+    }
+
+    async function loadGame() {
+      try {
+        const data = await request("/load", { method: "POST" });
+        if (data.success && data.pokemon) {
+          state.selectedPokemon = data.pokemon;
+          state.inventory = data.inventory;
+          state.opponentPokemon = null;
+          state.inBattle = false;
+          state.message = "Game loaded. Choose an opponent to continue.";
+          setBanner("Game loaded.", "info");
+          renderBattle();
+        } else {
+          setBanner(data.message, "error");
+        }
+      } catch (error) {
+        setBanner(error.message, "error");
+      }
+    }
+
+    function resetView() {
+      state.selectedPokemon = null;
+      state.opponentPokemon = null;
+      state.inBattle = false;
+      state.message = "Choose a Pokemon to start.";
+      setBanner("", "info");
+      renderBattle();
+      renderSelection();
+    }
+
+    document.getElementById("saveBtn").addEventListener("click", saveGame);
+    document.getElementById("loadBtn").addEventListener("click", loadGame);
+    document.getElementById("resetBtn").addEventListener("click", resetView);
+
+    window.selectPokemon = selectPokemon;
+    window.startBattle = startBattle;
+    window.useMove = useMove;
+
+    loadPokemon();
+  </script>
+</body>
+</html>

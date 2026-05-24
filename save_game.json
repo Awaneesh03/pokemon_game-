@@ -1,0 +1,22 @@
+{
+  "pokemon": {
+    "name": "Pikachu",
+    "type": "Electric",
+    "level": 2,
+    "xp": 50,
+    "max_hp": 45,
+    "current_hp": 45,
+    "attack": 60,
+    "defense": 43,
+    "speed": 92,
+    "moves": [
+      "Quick Attack",
+      "Thunderbolt"
+    ]
+  },
+  "inventory": {
+    "potion": 3,
+    "super_potion": 2,
+    "revive": 1
+  }
+}
