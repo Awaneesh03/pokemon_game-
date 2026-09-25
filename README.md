@@ -1,6 +1,19 @@
-# Pokemon Battle Game
+<div align="center">
 
-A full-stack Pokemon battle game with a Python/FastAPI backend, REST + WebSocket API, and two frontend options — a Next.js React app and a standalone vanilla JS UI. Supports single-player, tournament mode, and real-time multiplayer battles.
+# ⚔️ Pokémon Battle Game
+
+**A full-stack Pokémon battle game: Python game engine, FastAPI REST + WebSocket API, and two frontends (Next.js and vanilla JS). Single-player, tournament and real-time multiplayer.**
+
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)
+![WebSockets](https://img.shields.io/badge/WebSockets-010101?style=flat-square)
+![Next.js](https://img.shields.io/badge/Next.js-000000?style=flat-square&logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+
+[Features](#features) · [Tech Stack](#tech-stack) · [Getting Started](#getting-started) · [API Reference](#api-reference)
+
+</div>
 
 ---
 
@@ -196,12 +209,11 @@ Stat gains:    HP +10 · Attack +5 · Defense +3 · Speed +2
 
 ---
 
-## Screenshots
+## 👤 Author
 
-> _Coming soon — run the app and see it in action!_
+**Awaneesh Gupta** — B.Tech CSE (AI) @ Vedam School of Technology
 
----
+[![GitHub](https://img.shields.io/badge/GitHub-Awaneesh03-181717?style=flat-square&logo=github)](https://github.com/Awaneesh03)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-awaneesh--gupta-0A66C2?style=flat-square&logo=linkedin)](https://linkedin.com/in/awaneesh-gupta)
 
-## License
-
-MIT
+<p align="center"><sub>If you found this project useful, consider giving it a ⭐</sub></p>
